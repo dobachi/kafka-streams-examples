@@ -1,0 +1,21 @@
+[
+    {"namespace": "io.confluent.examples.streams.avro",
+     "type": "record",
+     "name": "FoodOrder",
+     "fields": [
+         {"name": "product_id", "type": "long"},
+         {"name": "category", "type": "string"}
+     ]
+    },
+
+    {"namespace": "io.confluent.examples.streams.avro",
+     "type": "record",
+     "name": "EnrichedFoodOrder",
+     "fields": [
+         {"name": "category",  "type": "string"},
+         {"name": "price", "type": "long"}
+     ]
+    }
+]
+
+
