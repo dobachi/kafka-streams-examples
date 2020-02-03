@@ -4,7 +4,7 @@
      "name": "FoodOrder",
      "fields": [
          {"name": "product_id", "type": "long"},
-         {"name": "category", "type": "string"}
+         {"name": "amount", "type": "long"}
      ]
     },
 
