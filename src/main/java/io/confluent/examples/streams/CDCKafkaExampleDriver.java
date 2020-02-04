@@ -57,13 +57,14 @@ public class CDCKafkaExampleDriver {
   private static final Random RANDOM = new Random();
   private static final int NUM_OF_PRODUCTS = 5;
   private static final int RECORDS_TO_GENERATE = 100;
+  private static final int MAX_AMOUNT = 10;
 
   public static void main(final String[] args) {
     final String bootstrapServers = args.length > 0 ? args[0] : "localhost:9092";
     final String schemaRegistryUrl = args.length > 1 ? args[1] : "http://localhost:8081";
 //    generateCustomers(bootstrapServers, schemaRegistryUrl, RECORDS_TO_GENERATE);
 //    generateProducts(bootstrapServers, schemaRegistryUrl, RECORDS_TO_GENERATE);
-    generateFoodOrders(bootstrapServers, schemaRegistryUrl, NUM_OF_PRODUCTS, RECORDS_TO_GENERATE);
+    generateFoodOrders(bootstrapServers, schemaRegistryUrl, NUM_OF_PRODUCTS, RECORDS_TO_GENERATE, MAX_AMOUNT);
 //    receiveEnrichedOrders(bootstrapServers, schemaRegistryUrl, RECORDS_TO_GENERATE);
   }
 
@@ -151,7 +152,8 @@ public class CDCKafkaExampleDriver {
       final String bootstrapServers,
       final String schemaRegistryUrl,
       final int numProducts,
-      final int count
+      final int count,
+      final int maxAmount
   ) {
     final SpecificAvroSerde<FoodOrder> ordersSerde = createSerde(schemaRegistryUrl);
 
@@ -164,9 +166,9 @@ public class CDCKafkaExampleDriver {
 
     final List<FoodOrder> allOrders = new ArrayList<>();
     for(long i = 0; i < count; i++) {
-      final long productId = RANDOM.nextInt(numProducts);
+      final int productId = RANDOM.nextInt(numProducts);
       final FoodOrder order = new FoodOrder(productId,
-                                    RANDOM.nextLong());
+                                    RANDOM.nextInt(maxAmount));
       allOrders.add(order);
       producer.send(new ProducerRecord<>(ORDER_TOPIC, i, order));
     }
