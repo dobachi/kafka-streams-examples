@@ -58,6 +58,7 @@ public class CDCKafkaExampleDriver {
   private static final int NUM_OF_PRODUCTS = 5;
   private static final int RECORDS_TO_GENERATE = 100;
   private static final int MAX_AMOUNT = 10;
+  private static final String FOODORDER_TOPIC = "foodorder";
 
   public static void main(final String[] args) {
     final String bootstrapServers = args.length > 0 ? args[0] : "localhost:9092";
@@ -68,6 +69,7 @@ public class CDCKafkaExampleDriver {
 //    receiveEnrichedOrders(bootstrapServers, schemaRegistryUrl, RECORDS_TO_GENERATE);
   }
 
+/*
   private static void receiveEnrichedOrders(
       final String bootstrapServers,
       final String schemaRegistryUrl,
@@ -92,6 +94,7 @@ public class CDCKafkaExampleDriver {
     }
     consumer.close();
   }
+*/
 
 /*
   static List<Customer> generateCustomers(
@@ -170,7 +173,7 @@ public class CDCKafkaExampleDriver {
       final FoodOrder order = new FoodOrder(productId,
                                     RANDOM.nextInt(maxAmount));
       allOrders.add(order);
-      producer.send(new ProducerRecord<>(ORDER_TOPIC, i, order));
+      producer.send(new ProducerRecord<>(FOODORDER_TOPIC, i, order));
     }
     producer.close();
     return allOrders;
