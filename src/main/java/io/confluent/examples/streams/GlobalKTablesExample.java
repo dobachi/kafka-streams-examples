@@ -92,11 +92,11 @@ import java.util.Properties;
  */
 public class GlobalKTablesExample {
 
-  static final String ORDER_TOPIC = "order";
-  static final String CUSTOMER_TOPIC = "customer";
-  static final String PRODUCT_TOPIC =  "product";
-  static final String CUSTOMER_STORE = "customer-store";
-  static final String PRODUCT_STORE = "product-store";
+  static final String ORDER_TOPIC = "foodorder";
+//  static final String CUSTOMER_TOPIC = "customer";
+//  static final String PRODUCT_TOPIC =  "product";
+//  static final String CUSTOMER_STORE = "customer-store";
+//  static final String PRODUCT_STORE = "product-store";
   static final String ENRICHED_ORDER_TOPIC = "enriched-order";
 
   public static void main(final String[] args) {
