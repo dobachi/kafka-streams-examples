@@ -15,10 +15,7 @@
  */
 package io.confluent.examples.streams;
 
-import io.confluent.examples.streams.avro.Customer;
-import io.confluent.examples.streams.avro.EnrichedOrder;
-import io.confluent.examples.streams.avro.Order;
-import io.confluent.examples.streams.avro.Product;
+import io.confluent.examples.streams.avro.*;
 import io.confluent.kafka.serializers.AbstractKafkaAvroSerDeConfig;
 import io.confluent.kafka.streams.serdes.avro.SpecificAvroSerde;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -33,6 +30,8 @@ import org.apache.kafka.streams.state.KeyValueStore;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Properties;
+
+import static io.confluent.examples.streams.GlobalKTablesExample.ENRICHED_ORDER_TOPIC;
 
 /**
  * Demonstrates how to perform joins between  KStreams and GlobalKTables, i.e. joins that
@@ -84,12 +83,15 @@ import java.util.Properties;
  */
 public class CDCKafkaExample {
 
-  static final String ORDER_TOPIC = "order";
-  static final String CUSTOMER_TOPIC = "customer";
-  static final String PRODUCT_TOPIC =  "product";
-  static final String CUSTOMER_STORE = "customer-store";
-  static final String PRODUCT_STORE = "product-store";
-  static final String ENRICHED_ORDER_TOPIC = "enriched-order";
+//  static final String ORDER_TOPIC = "order";
+//  static final String CUSTOMER_TOPIC = "customer";
+//  static final String PRODUCT_TOPIC =  "product";
+//  static final String CUSTOMER_STORE = "customer-store";
+//  static final String PRODUCT_STORE = "product-store";
+  static final String FOODORDER_TOPIC = "foodorder";
+  static final String FOOD_STORE = "food-store";
+  static final String FOOD_TOPIC = "db_test_table";
+  static final String ENRICHED_FOODORDER_TOPIC = "enriched-order";
 
   public static void main(final String[] args) {
     final String bootstrapServers = args.length > 0 ? args[0] : "localhost:9092";
@@ -131,34 +133,40 @@ public class CDCKafkaExample {
     streamsConfiguration.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
 
     // create and configure the SpecificAvroSerdes required in this example
-    final SpecificAvroSerde<Order> orderSerde = new SpecificAvroSerde<>();
+    final SpecificAvroSerde<FoodOrder> orderSerde = new SpecificAvroSerde<>();
     final Map<String, String> serdeConfig =
         Collections.singletonMap(AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG,
             schemaRegistryUrl);
     orderSerde.configure(serdeConfig, false);
 
-    final SpecificAvroSerde<Customer> customerSerde = new SpecificAvroSerde<>();
-    customerSerde.configure(serdeConfig, false);
+//    final SpecificAvroSerde<Customer> customerSerde = new SpecificAvroSerde<>();
+//    customerSerde.configure(serdeConfig, false);
+//
+//    final SpecificAvroSerde<Product> productSerde = new SpecificAvroSerde<>();
+//    productSerde.configure(serdeConfig, false);
 
-    final SpecificAvroSerde<Product> productSerde = new SpecificAvroSerde<>();
-    productSerde.configure(serdeConfig, false);
+    final SpecificAvroSerde<Food> foodSerde = new SpecificAvroSerde<>();
+    foodSerde.configure(serdeConfig, false);
 
-    final SpecificAvroSerde<EnrichedOrder> enrichedOrdersSerde = new SpecificAvroSerde<>();
-    enrichedOrdersSerde.configure(serdeConfig, false);
+    final SpecificAvroSerde<EnrichedFoodOrder> enrichedFoodOrdersSerde = new SpecificAvroSerde<>();
+    enrichedFoodOrdersSerde.configure(serdeConfig, false);
 
     final StreamsBuilder builder = new StreamsBuilder();
 
     // Get the stream of orders
-    final KStream<Long, Order> ordersStream = builder.stream(ORDER_TOPIC, Consumed.with(Serdes.Long(), orderSerde));
+    final KStream<Long, FoodOrder> ordersStream = builder.stream(FOODORDER_TOPIC, Consumed.with(Serdes.Long(), orderSerde));
 
     // Create a global table for customers. The data from this global table
     // will be fully replicated on each instance of this application.
+/*
     final GlobalKTable<Long, Customer>
         customers =
         builder.globalTable(CUSTOMER_TOPIC, Materialized.<Long, Customer, KeyValueStore<Bytes, byte[]>>as(CUSTOMER_STORE)
                 .withKeySerde(Serdes.Long())
                 .withValueSerde(customerSerde));
+*/
 
+/*
     // Create a global table for products. The data from this global table
     // will be fully replicated on each instance of this application.
     final GlobalKTable<Long, Product>
@@ -166,26 +174,36 @@ public class CDCKafkaExample {
         builder.globalTable(PRODUCT_TOPIC, Materialized.<Long, Product, KeyValueStore<Bytes, byte[]>>as(PRODUCT_STORE)
                 .withKeySerde(Serdes.Long())
                 .withValueSerde(productSerde));
+*/
+
+    final GlobalKTable<Long, Food>
+            foods =
+            builder.globalTable(FOOD_TOPIC, Materialized.<Long, Food, KeyValueStore<Bytes, byte[]>>as(FOOD_STORE)
+                    .withKeySerde(Serdes.Long())
+                    .withValueSerde(foodSerde));
 
     // Join the orders stream to the customer global table. As this is global table
     // we can use a non-key based join with out needing to repartition the input stream
-    final KStream<Long, CustomerOrder> customerOrdersStream = ordersStream.join(customers,
-                                                                (orderId, order) -> order.getCustomerId(),
-                                                                (order, customer) -> new CustomerOrder(customer,
-                                                                                                       order));
+    final KStream<Long, EnrichedFoodOrder> foodOrdersStream = ordersStream.join(foods,
+                                                                (orderId, order) -> order.getProductId().longValue(),
+                                                                (order, food) -> new EnrichedFoodOrder(order.getProductId(),
+                                                                                                       order.getAmount(),
+                                                                                                        food));
 
+/*
     // Join the enriched customer order stream with the product global table. As this is global table
     // we can use a non-key based join without needing to repartition the input stream
-    final KStream<Long, EnrichedOrder> enrichedOrdersStream = customerOrdersStream.join(products,
+    final KStream<Long, EnrichedOrder> enrichedOrdersStream = foodOrdersStream.join(products,
                                                                         (orderId, customerOrder) -> customerOrder
                                                                             .productId(),
                                                                         (customerOrder, product) -> new EnrichedOrder(
                                                                             product,
                                                                             customerOrder.customer,
                                                                             customerOrder.order));
+*/
 
     // write the enriched order to the enriched-order topic
-    enrichedOrdersStream.to(ENRICHED_ORDER_TOPIC, Produced.with(Serdes.Long(), enrichedOrdersSerde));
+    foodOrdersStream.to(ENRICHED_ORDER_TOPIC, Produced.with(Serdes.Long(), enrichedFoodOrdersSerde));
 
     return new KafkaStreams(builder.build(), streamsConfiguration);
   }

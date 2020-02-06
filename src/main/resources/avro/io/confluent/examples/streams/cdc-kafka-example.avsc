@@ -10,10 +10,23 @@
 
     {"namespace": "io.confluent.examples.streams.avro",
      "type": "record",
+     "name": "Food",
+     "fields": [
+         {"name": "seq", "type": "int"},
+         {"name": "ts", "type": "int"},
+         {"name": "item", "type": "string"},
+         {"name": "price", "type": "int"},
+         {"name": "category", "type": "string"}
+     ]
+    },
+
+    {"namespace": "io.confluent.examples.streams.avro",
+     "type": "record",
      "name": "EnrichedFoodOrder",
      "fields": [
-         {"name": "category",  "type": "string"},
-         {"name": "price", "type": "long"}
+         {"name": "product_id",  "type": "int"},
+         {"name": "amount", "type": "int"},
+         {"name": "food", "type": "io.confluent.examples.streams.avro.Food"}
      ]
     }
 ]

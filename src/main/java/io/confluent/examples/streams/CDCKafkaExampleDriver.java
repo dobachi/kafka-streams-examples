@@ -35,6 +35,7 @@ import org.apache.kafka.common.serialization.Serdes;
 import java.time.Duration;
 import java.util.*;
 
+import static io.confluent.examples.streams.CDCKafkaExample.FOODORDER_TOPIC;
 import static io.confluent.examples.streams.GlobalKTablesExample.*;
 
 /**
@@ -58,7 +59,6 @@ public class CDCKafkaExampleDriver {
   private static final int NUM_OF_PRODUCTS = 5;
   private static final int RECORDS_TO_GENERATE = 100;
   private static final int MAX_AMOUNT = 10;
-  private static final String FOODORDER_TOPIC = "foodorder";
 
   public static void main(final String[] args) {
     final String bootstrapServers = args.length > 0 ? args[0] : "localhost:9092";
