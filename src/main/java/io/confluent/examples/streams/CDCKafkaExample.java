@@ -148,6 +148,9 @@ public class CDCKafkaExample {
     final SpecificAvroSerde<Food> foodSerde = new SpecificAvroSerde<>();
     foodSerde.configure(serdeConfig, false);
 
+    final SpecificAvroSerde<FoodOrder> foodOrdersSerde = new SpecificAvroSerde<>();
+    foodOrdersSerde.configure(serdeConfig, false);
+
     final SpecificAvroSerde<EnrichedFoodOrder> enrichedFoodOrdersSerde = new SpecificAvroSerde<>();
     enrichedFoodOrdersSerde.configure(serdeConfig, false);
 
@@ -155,6 +158,7 @@ public class CDCKafkaExample {
 
     // Get the stream of orders
     final KStream<Long, FoodOrder> ordersStream = builder.stream(FOODORDER_TOPIC, Consumed.with(Serdes.Long(), orderSerde));
+    ordersStream.to("debug-foodorder", Produced.with(Serdes.Long(), foodOrdersSerde));
 
     // Create a global table for customers. The data from this global table
     // will be fully replicated on each instance of this application.
