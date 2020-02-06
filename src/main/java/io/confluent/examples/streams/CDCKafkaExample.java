@@ -203,7 +203,7 @@ public class CDCKafkaExample {
 */
 
     // write the enriched order to the enriched-order topic
-    foodOrdersStream.to(ENRICHED_ORDER_TOPIC, Produced.with(Serdes.Long(), enrichedFoodOrdersSerde));
+    foodOrdersStream.to(ENRICHED_FOODORDER_TOPIC, Produced.with(Serdes.Long(), enrichedFoodOrdersSerde));
 
     return new KafkaStreams(builder.build(), streamsConfiguration);
   }
