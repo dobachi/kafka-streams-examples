@@ -162,10 +162,13 @@ public class CDCKafkaExampleDriver {
 
     final Properties producerProperties = new Properties();
     producerProperties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+    producerProperties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, Serdes.Long().serializer().getClass());
+    producerProperties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, ordersSerde.serializer().getClass());
 
     final KafkaProducer<Long, FoodOrder>
         producer =
         new KafkaProducer<>(producerProperties, Serdes.Long().serializer(), ordersSerde.serializer());
+
 
     final List<FoodOrder> allOrders = new ArrayList<>();
     for(long i = 0; i < count; i++) {
@@ -173,7 +176,7 @@ public class CDCKafkaExampleDriver {
       final FoodOrder order = new FoodOrder(productId,
                                     RANDOM.nextInt(maxAmount));
       allOrders.add(order);
-      producer.send(new ProducerRecord<>(FOODORDER_TOPIC, i, order));
+      producer.send(new ProducerRecord<Long, FoodOrder>(FOODORDER_TOPIC, (long) productId, order));
     }
     producer.close();
     return allOrders;

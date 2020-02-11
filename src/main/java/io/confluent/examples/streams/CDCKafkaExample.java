@@ -206,6 +206,7 @@ public class CDCKafkaExample {
                                                                             customerOrder.order));
 */
 
+    foodOrdersStream.foreach((key, en) -> System.out.println(en));
     // write the enriched order to the enriched-order topic
     foodOrdersStream.to(ENRICHED_FOODORDER_TOPIC, Produced.with(Serdes.Long(), enrichedFoodOrdersSerde));
 
