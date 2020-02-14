@@ -170,8 +170,7 @@ public class CDCKafkaExampleDriver {
 
     final KafkaProducer<Long, FoodOrder>
         producer =
-        new KafkaProducer<>(producerProperties, Serdes.Long().serializer(), ordersSerde.serializer());
-
+        new KafkaProducer<>(producerProperties);
 
     final List<FoodOrder> allOrders = new ArrayList<>();
     for(long i = 0; i < count; i++) {
