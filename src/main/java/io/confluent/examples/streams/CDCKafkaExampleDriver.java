@@ -164,6 +164,7 @@ public class CDCKafkaExampleDriver {
     producerProperties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
     producerProperties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, Serdes.Long().serializer().getClass());
     producerProperties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, ordersSerde.serializer().getClass());
+    producerProperties.put(AbstractKafkaAvroSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, schemaRegistryUrl);
 
     final KafkaProducer<Long, FoodOrder>
         producer =
